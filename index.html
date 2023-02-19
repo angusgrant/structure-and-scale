@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dice Library</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>Dice Library</h1>
+
+		<p>All of the magic here happens in the console.</p>
+
+
+		<script>
+
+      let roll = (function() {
+			/**
+			 * Randomly shuffle an array
+			 * https://stackoverflow.com/a/2450976/1293256
+			 * @param  {Array} array The array to shuffle
+			 * @return {Array}       The shuffled array
+			 */
+			function shuffle (array) {
+
+				let currentIndex = array.length;
+				let temporaryValue, randomIndex;
+
+				// While there remain elements to shuffle...
+				while (0 !== currentIndex) {
+					// Pick a remaining element...
+					randomIndex = Math.floor(Math.random() * currentIndex);
+					currentIndex -= 1;
+
+					// And swap it with the current element.
+					temporaryValue = array[currentIndex];
+					array[currentIndex] = array[randomIndex];
+					array[randomIndex] = temporaryValue;
+				}
+
+				return array;
+
+			}
+
+			// different sidedd dice arrays
+      function d2(){ return shuffle([...Array(2).keys()])[0] + 1};
+      function d4(){ return shuffle([...Array(4).keys()])[0] + 1};
+			function d6() { return shuffle([...Array(6).keys()])[0] + 1};
+      function d8() { return shuffle([...Array(8).keys()])[0] + 1};
+      function d10() { return shuffle([...Array(10).keys()])[0] + 1};
+      function d12() { return shuffle([...Array(12).keys()])[0] + 1};
+      function d20() { return shuffle([...Array(20).keys()])[0] + 1};
+
+      return { d2, d4, d6, d8, d10, d12, d20 }
+
+    }) ();
+		</script>
+	</body>
+</html>
