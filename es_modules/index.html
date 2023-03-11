@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dice - ES Modules</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>Dice - Dice - ES Modules</h1>
+
+		<p>All of the magic here happens in the console.</p>
+
+		<script type="module">
+
+            	// import some functions
+                import {d6, d20} from './roll.js';
+
+                // roll some dice
+                let roll1 = d6();
+                let roll2 = d20();
+
+                console.log(roll1, roll2);
+                        
+		</script>
+	</body>
+</html>

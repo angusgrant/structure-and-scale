@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="output"></div>
+    <script>
+ const keywords = ['chinese', 'lungs', 'research', 'conference', 'microbiology', 'covid'];
+function queryDatabaseAndWriteResults() {
+  // Query the database to find the sentence with the highest number of matches for each keyword
+  const transaction = db.transaction(['sentences'], 'readonly');
+  const objectStore = transaction.objectStore('sentences');
+  const results = {};
+  const promises = keywords.map((keyword) => {
+    return new Promise((resolve) => {
+      const index = objectStore.index(keyword);
+      const request = index.openCursor(null, 'prev');
+      let maxCount = 0;
+      let maxSentence = '';
+      request.onsuccess = function(event) {
+        const cursor = event.target.result;
+        if (cursor) {
+          const count = cursor.value[keyword];
+          if (count > maxCount) {
+            maxCount = count;
+            maxSentence = cursor.value.text;
+          }
+          cursor.continue();
+        } else {
+          results[keyword] = { sentence: maxSentence, count: maxCount };
+          resolve();
+        }
+      };
+      request.onerror = function(event) {
+        console.error(event.target.error);
+        resolve();
+      };
+    });
+  });
+  Promise.all(promises).then(() => {
+    // Write the results to the page
+    const outputElement = document.getElementById('output');
+    outputElement.innerHTML = '';
+    keywords.forEach((keyword) => {
+      const result = results[keyword];
+      const html = `<div><strong>${keyword}:</strong> ${result.sentence} (${result.count} matches)</div>`;
+      outputElement.innerHTML += html;
+    });
+  });
+}
+
+// Open the database connection
+const request = indexedDB.open('sentences', 1);
+let db;
+
+let dbCreated = false;
+request.onupgradeneeded = function(event) {
+  // Create the object store
+  dbCreated = true
+  db = event.target.result;
+  const objectStore = db.createObjectStore('sentences', { keyPath: 'text' });
+  objectStore.createIndex('text', 'text', { unique: true });
+
+  // Add a column for each keyword to the object store
+ 
+  keywords.forEach((keyword) => {
+    objectStore.createIndex(keyword, keyword, { unique: false });
+  });
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+
+  // Add sample sentences to the database
+  const sentences = [
+    'Transformative Agreement Signed between the Microbiology Society and the Chinese Academy of Agricultural Sciences. The Microbiology Society and the Chinese Academy of Agricultural Sciences are pleased to announce a transformative agreement starting in 2023. The Publish and Read model will allow affiliated researchers the Chinese Academy of Agricultural Sciences to publish an unlimited number of Open Access (OA) articles in hybrid and fully OA titles, as well as having full read access the Society’s journals portfolio. The Microbiology Society are represented in China by the Charlesworth Group. ',
+    'A probiotic for our lungs? New research poses questions about the future of treating COVID-19 The results of new research into the effects of COVID-19 have suggested that a mild-to-moderate COVID-19 infection can lead to alterations of the upper respiratory tract (URT) microbiota, including a reduction in bacterial diversity and community structure that persists for at least several weeks after the initial infection. Researchers at Vanderbilt University Medical Center, Nashville, Tennessee, USA, observed a relationship between the URT microbiota and the severity of COVID symptoms in their patients. They hope this could lead to new therapy methods to reduce the effects of COVID-19 in the future.',
+    'Response to reports that £1.6 billion of R&D funding has been returned to the Treasury Responding to a press release from theCampaign for Science and Engineering (CaSE)stating that the Department of Business, Energy and Industrial Strategy (BEIS) has returned £1.6 billion of funds to the Treasury, which had previously been allocated for Horizon Europe association or domestic alternatives, Professor Gurdyal Besra FRS, President of the Microbiology Society said:',
+    'ANNUAL CONFERENCE 2023: EARLY BIRD DEADLINE IN ONE WEEK The early bird registration deadline to attend the Microbiology Societys flagship Annual Conference is 23:59 GMT on Tuesday 28 February 2023. Register now for this event, which will take place in person at the Birmingham International Convention Centre on Monday 17–Thursday 20 April 2023. '
+  ];
+  const transaction = db.transaction(['sentences'], 'readwrite');
+  const objectStore = transaction.objectStore('sentences');
+  sentences.forEach((text) => {
+    const frequencies = {};
+    
+    keywords.forEach((keyword) => {
+      const count = (text.match(new RegExp(keyword, 'gi')) || []).length;
+      frequencies[keyword] = count;
+    });
+    objectStore.add({ text, ...frequencies });
+  });
+
+  queryDatabaseAndWriteResults();
+  transaction.oncomplete = function() {
+    console.log('Sentences added to database');
+
+    // Query the database and write the results to the page
+    queryDatabaseAndWriteResults();
+  };
+};
+
+request.onerror = function(event) {
+  console.error('Database error:', event.target.error);
+};
+
+
+
+    </script>
+</body>
+
+</html>
