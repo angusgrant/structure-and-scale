@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Offline | Seven Seas</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+
+		<nav>
+			<a href="index.html">🏴‍☠️ Seven Seas</a>
+			<p class="description">The travel app for pirates</p>
+		</nav>
+
+		<h1>Ahoy matey! Ye be offline.</h1>
+
+		<p>You'll be able to travel the seven seas again as soon as ye be back online.</p>
+
+
+		<script>
+			if (navigator && navigator.serviceWorker) {
+				navigator.serviceWorker.register('sw.js');
+			}
+		</script>
+
+	</body>
+</html>
