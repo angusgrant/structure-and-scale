@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Offline | Seven Seas</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+
+		<nav>
+			<a href="index.html">🏴‍☠️ Seven Seas</a>
+			<p class="description">The travel app for pirates</p>
+		</nav>
+
+		<h1>Ahoy matey! Ye be offline.</h1>
+
+		<p>You'll be able to travel the seven seas again as soon as ye be back online. However we have temporarily cached the following page URLS for you to enjoy the functionality offline:  </p>
+
+        <div id="offline-links">
+
+        </div>
+
+
+		<script>
+			if (navigator && navigator.serviceWorker) {
+
+                // Register service worker
+				navigator.serviceWorker.register('sw.js');
+
+                let offlineLinkAppendPoint = document.querySelector('#offline-links');
+
+                caches.open('html').then(function(cache) {
+                    cache.keys().then(function(keys) {
+                        var offlineLinks = '';
+                        keys.forEach(function(request) {
+                            //don't display self referential offline link on offline page 
+                            if (!request.url.includes('offline.html') ) {
+                                offlineLinks += `<li><a href="${request.url}">${request.url}</a></li>`;
+                            }
+                        });
+                        if (offlineLinks.length > 0) {
+                            offlineLinkAppendPoint.innerHTML =  `<ul>${offlineLinks}</ul>`
+                        }
+  });
+});
+
+              
+			}
+		</script>
+
+	</body>
+</html>
